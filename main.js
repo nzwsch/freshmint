@@ -70,34 +70,73 @@ const drawRoulette = (active) => {
     punchCircle(context, width, height, radius * 0.45);
 };
 
+const rouletteAnimation = () =>
+    new Promise((done) => {
+        let currentColor,
+            currentPos = 0,
+            incrementer = 0.01,
+            startColor = parseInt(Math.random() * colors.length);
+
+        const animation = (elapsed) => {
+            if (elapsed > 2000) incrementer += 0.0035;
+            currentPos += 1 / incrementer;
+            currentColor = parseInt((startColor + currentPos / 100) % colors.length);
+
+            drawRoulette(currentColor);
+        };
+
+        let elapsed, start;
+
+        const step = (timestamp) => {
+            if (start == null) start = timestamp;
+            elapsed = timestamp - start;
+
+            animation(elapsed);
+
+            // 5 sec.
+            if (elapsed < 5000) {
+                previousTimestamp = timestamp;
+                window.requestAnimationFrame(step);
+            } else {
+                done(currentColor);
+            }
+        };
+
+        button.setAttribute('disabled', true);
+        window.requestAnimationFrame(step);
+    });
+
+const blinkAnimation = (currentColor) =>
+    new Promise((done) => {
+        const animation = (elapsed) => {
+            drawRoulette(parseInt((elapsed / 300) % 2) ? currentColor : undefined);
+        };
+
+        let elapsed, start;
+
+        const step = (timestamp) => {
+            if (start == null) start = timestamp;
+            elapsed = timestamp - start;
+
+            animation(elapsed);
+
+            // 1 sec.
+            if (elapsed < 1000) {
+                previousTimestamp = timestamp;
+                window.requestAnimationFrame(step);
+            } else {
+                drawRoulette(currentColor);
+                done();
+            }
+        };
+
+        window.requestAnimationFrame(step);
+    });
+
 drawRoulette();
 
-button.addEventListener('click', () => {
-    let currentPos = 0,
-        incrementer = 0.01,
-        startColor = parseInt(Math.random() * colors.length);
-
-    const animation = (elapsed) => {
-        if (elapsed > 2000) incrementer += 0.0035;
-        currentPos += 1 / incrementer;
-        drawRoulette(parseInt((startColor + currentPos / 100) % colors.length));
-    };
-
-    let elapsed, start;
-
-    const step = (timestamp) => {
-        if (start == null) start = timestamp;
-        elapsed = timestamp - start;
-
-        animation(elapsed);
-        if (elapsed < 5000) {
-            previousTimestamp = timestamp;
-            window.requestAnimationFrame(step);
-        } else {
-            button.removeAttribute('disabled');
-        }
-    };
-
-    button.setAttribute('disabled', true);
-    window.requestAnimationFrame(step);
-});
+button.addEventListener('click', () =>
+    rouletteAnimation()
+        .then((color) => blinkAnimation(color))
+        .then(() => button.removeAttribute('disabled'))
+);
