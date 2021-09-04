@@ -20,6 +20,19 @@ const resetCanvas = (ctx, w, h) => {
   ctx.clearRect(0, 0, w, h);
 };
 
+const punchCircle = (ctx, w, h, r) => {
+  const x = w / 2,
+    y = h / 2,
+    p = Math.PI * 2
+
+  ctx.fillStyle = '#fff';
+
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.arc(x, y, r, 0, p, false);
+  ctx.fill();
+}
+
 const drawBaum = (ctx, w, h, r, i) => {
   const x = w / 2,
     y = h / 2,
@@ -28,12 +41,16 @@ const drawBaum = (ctx, w, h, r, i) => {
     k = 2 / colors.length,
     o = 0.5 + 1 / colors.length;
 
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = '#fff';
+  ctx.fillStyle = colors[i];
+
   ctx.beginPath();
   ctx.moveTo(x, y);
   ctx.arc(x, y, r, p * (i * k - o), p * (j * k - o), false);
   ctx.lineTo(x, y);
-  ctx.fillStyle = colors[i];
   ctx.fill();
+  ctx.stroke();
 };
 
 const drawRoulette = () => {
@@ -45,8 +62,10 @@ const drawRoulette = () => {
   resetCanvas(context, width, height);
 
   for (let i = 0; i < colors.length; i++) {
-    drawBaum(context, width, height, radius, i);
+    drawBaum(context, width, height, radius*0.85, i);
   }
+
+  punchCircle(context, width, height, radius*0.45)
 };
 
 drawRoulette();
