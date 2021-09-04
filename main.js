@@ -93,8 +93,8 @@ const rouletteAnimation = () =>
 
             animation(elapsed);
 
-            // 5 sec.
-            if (elapsed < 5000) {
+            // 4 sec.
+            if (elapsed < 4000) {
                 previousTimestamp = timestamp;
                 window.requestAnimationFrame(step);
             } else {
