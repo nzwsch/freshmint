@@ -43,3 +43,7 @@ button:active {
   border-top-width: 3px;
   border-bottom-width: 1px;
 }
+
+button[disabled] {
+  opacity: 0.3;
+}
